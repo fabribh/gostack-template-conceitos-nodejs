@@ -29,8 +29,6 @@ app.post("/repositories", (request, response) => {
     likes: 0
   };
 
-  console.log(repositore);
-
   repositories.push(repositore);
 
   response.json(repositore);
@@ -41,7 +39,7 @@ app.put("/repositories/:id", (request, response) => {
   const { id } = request.params
   const { title, url, techs } = request.body
 
-  const repositoreIndex = repositories.findIndex(repositore => repositore.id === id);
+  const repositoreIndex = getIndexArray(id);
 
   if (repositoreIndex < 0) {
     return response.status(400).json({
@@ -63,11 +61,41 @@ app.put("/repositories/:id", (request, response) => {
 });
 
 app.delete("/repositories/:id", (req, res) => {
-  // TODO
+  const { id } = req.params;
+
+  const repositoreIndex = getIndexArray(id);
+  
+  if (repositoreIndex < 0) {
+    return res.status(400).json({
+      error: 'Repositore not found'
+    })
+  }
+
+  repositories.splice(repositoreIndex, 1);
+  return res.status(204).json();
+
 });
 
 app.post("/repositories/:id/like", (request, response) => {
-  // TODO
+  const { id } = request.params;
+
+  const repositoreIndex = getIndexArray(id);
+
+  if (repositoreIndex < 0) {
+    return res.status(400).json({
+      error: 'Repositore not found'
+    })
+  }
+
+  repositories[repositoreIndex].likes += 1; 
+
+  return response.status(201).json(repositories[repositoreIndex]);
+  
 });
+
+function getIndexArray(id) {
+  const indexOfarray =  repositories.findIndex(repositore => repositore.id === id);
+  return indexOfarray;
+}
 
 module.exports = app;
